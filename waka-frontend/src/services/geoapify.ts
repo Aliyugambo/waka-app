@@ -1,14 +1,17 @@
 const GEOAPIFY_API_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY;
 
-export interface Place {
+export type Place = {
   id: string;
   name: string;
-  type: string;
   address: string;
-  lat: number;
-  lon: number;
-  image: string;
-}
+  type: string;
+  image?: string;
+  lat?: number;
+  lon?: number;
+  latitude?: number;
+  longitude?: number;
+};
+
 
 interface GeoapifyFeature {
   properties: {
@@ -42,6 +45,28 @@ export async function fetchPlaces(lat: number, lon: number, type: string): Promi
     address: f.properties.formatted,
     lat: f.geometry.coordinates[1],
     lon: f.geometry.coordinates[0],
-    image: f.properties.datasource?.raw?.image || "/default-place.jpg",
+    image: f.properties.datasource?.raw?.image || "/https://source.unsplash.com/300x200/?city,building",
   }));
+}
+
+
+export async function getRouteInfo(
+  startLat: number,
+  startLon: number,
+  endLat: number,
+  endLon: number
+) {
+  const apiKey = import.meta.env.VITE_GEOAPIFY_API_KEY;
+  const url = `https://api.geoapify.com/v1/routing?waypoints=${startLat},${startLon}|${endLat},${endLon}&mode=walk&apiKey=${apiKey}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  const summary = data?.features?.[0]?.properties?.summary;
+
+  return {
+    time: summary?.duration, // in seconds
+    distance: summary?.distance, // in meters
+    steps: data?.features?.[0]?.properties?.legs?.[0]?.steps || [],
+  };
 }

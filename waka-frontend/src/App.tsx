@@ -5,6 +5,7 @@ import LoadingScreen from "./components/landingpage/LoadingScreen";
 import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import SignUp from "./pages/auth/SignUp";
+import PlaceDetail from "./components/homepage/PlaceDetail";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -24,6 +25,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/places/:id" element={<PlaceDetail />} />
+
         </Routes>
       </AuthProvider>
     </Router>

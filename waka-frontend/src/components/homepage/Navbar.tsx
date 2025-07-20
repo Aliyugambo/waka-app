@@ -13,19 +13,9 @@ const Navbar = () => {
         className="text-orange-500 font-bold text-xl cursor-pointer"
         onClick={() => navigate('/')}
       >
-         <img src={logo} alt="Waka Logo" className="h-20 w-20 animate-bounce mb-4" />
+         <img src={logo} alt="Waka Logo" className="h-15 w-15 animate-bounce mb-4" />
       </div>
-      <div className="flex gap-2 items-center">
-        <input
-          className="border px-3 py-2 rounded-full"
-          placeholder="Search places"
-        />
-        <select className="border px-3 py-2 rounded-full">
-          <option value="Kaduna">Kaduna</option>
-          <option value="Abuja">Abuja</option>
-        </select>
-      </div>
-      <div className="flex gap-4">
+            <div className="flex gap-4">
         {isAuthenticated ? (
           <button
             className="text-sm font-medium text-red-500"
