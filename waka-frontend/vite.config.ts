@@ -1,7 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { fileURLToPath } from 'node:url'
+import path from "path";
+import { fileURLToPath } from "url"; // ✅ Fix: use "url" not "node:url"
+
+const __filename = fileURLToPath(import.meta.url as unknown as string); // ✅ Fix type issue
+const __dirname = path.dirname(__filename);
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,9 +13,9 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: '@',
-        replacement: fileURLToPath(new URL('./src', import.meta.url))
+        find: "@",
+        replacement: path.resolve(__dirname, "src"), // ✅ Use "path.resolve"
       },
-    ]
+    ],
   },
 });
