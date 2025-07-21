@@ -4,6 +4,7 @@ import PlacesGrid from "../components/homepage/PlacesGrid";
 import Navbar from "../components/homepage/Navbar";
 import Hero from "../components/homepage/Hero";
 import { useAuth } from "../contexts/AuthContext";
+import type { Place } from "../services/geoapify";
 
 const PLACE_TYPES = [
   { label: "Food", value: "catering.restaurant" },
@@ -15,7 +16,7 @@ const PLACE_TYPES = [
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [type, setType] = useState(PLACE_TYPES[0].value);
-  const [places, setPlaces] = useState([]);
+  const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
   const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [search, setSearch] = useState("");
