@@ -33,9 +33,9 @@ const PlaceCard = ({ place, isAuthenticated }: PlaceCardProps) => {
   };
 
   const getGoogleMapsDirectionLink = () => {
-    const lat = place.lat || place.latitude;
-    const lon = place.lon || place.longitude;
-    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+    const lat = place.lat;
+  const lon = place.lon;
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
   };
 
   return (
@@ -44,7 +44,7 @@ const PlaceCard = ({ place, isAuthenticated }: PlaceCardProps) => {
       onClick={handleCardClick}
     >
       <img
-        src={place.image || "/placeholder.jpg"}
+        src={place.image || `https://source.unsplash.com/300x200/?${place.type}`}
         alt={place.name}
         className="h-48 w-full object-cover"
       />
