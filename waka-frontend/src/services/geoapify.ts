@@ -1,5 +1,3 @@
-const GEOAPIFY_API_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY;
-
 export type Place = {
   id: string;
   name: string;
@@ -10,72 +8,69 @@ export type Place = {
   lon: number;
 };
 
-interface GeoapifyFeature {
-  properties: {
-    place_id: string;
-    name?: string;
-    street?: string;
-    categories?: string[];
-    formatted: string;
-    datasource?: {
-      raw?: {
-        image?: string;
-      };
-    };
-  };
-  geometry: {
-    coordinates: [number, number]; // [lon, lat]
-  };
-}
-
 export async function fetchPlaces(
   lat: number,
   lon: number,
-  type: string
+  type: string,
+  search?: string
 ): Promise<Place[]> {
-  const radius = 10000;
-  const url = `https://api.geoapify.com/v2/places?categories=${type}&filter=circle:${lon},${lat},${radius}&limit=20&apiKey=${GEOAPIFY_API_KEY}`;
-
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error('Failed to fetch places');
+  const baseUrl = 'http://localhost:3000'; // Your backend base URL
+  const params = new URLSearchParams({
+    lat: lat.toString(),
+    lon: lon.toString(),
+    type,
+  });
+  if (search && search.trim()) {
+    params.append('search', search.trim());
   }
 
-  const data = await res.json();
-
-  return data.features.map((f: GeoapifyFeature): Place => {
-    const name = f.properties.name || f.properties.street || 'Unknown';
-    const imageQuery = name !== 'Unknown' ? name : type;
-
-    return {
-      id: f.properties.place_id,
-      name,
-      type: f.properties.categories?.[0] || '',
-      address: f.properties.formatted,
-      lat: f.geometry.coordinates[1],
-      lon: f.geometry.coordinates[0],
-      image: f.properties.datasource?.raw?.image || `https://source.unsplash.com/300x200/?${encodeURIComponent(imageQuery)}`,
-    };
-  });
+  const res = await fetch(`${baseUrl}/place/google?${params.toString()}`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch places from backend');
+  }
+  return await res.json();
 }
 
-
+// Keep your getRouteInfo as-is if you still use Geoapify for routing
 export async function getRouteInfo(
   startLat: number,
   startLon: number,
   endLat: number,
   endLon: number
 ) {
+  console.log('DEBUG: getRouteInfo - Starting route calculation from:', { startLat, startLon }, 'to:', { endLat, endLon });
+  
+  const GEOAPIFY_API_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY;
+  console.log('DEBUG: getRouteInfo - API Key available:', !!GEOAPIFY_API_KEY);
+  
   const url = `https://api.geoapify.com/v1/routing?waypoints=${startLat},${startLon}|${endLat},${endLon}&mode=walk&apiKey=${GEOAPIFY_API_KEY}`;
+  console.log('DEBUG: getRouteInfo - Request URL:', url.replace(GEOAPIFY_API_KEY || '', '[API_KEY]'));
 
-  const res = await fetch(url);
-  const data = await res.json();
+  try {
+    const res = await fetch(url);
+    console.log('DEBUG: getRouteInfo - Response status:', res.status);
+    
+    if (!res.ok) {
+      console.error('DEBUG: getRouteInfo - API request failed:', res.status, res.statusText);
+      throw new Error(`API request failed: ${res.status}`);
+    }
+    
+    const data = await res.json();
+    console.log('DEBUG: getRouteInfo - Response data:', data);
 
-  const summary = data?.features?.[0]?.properties?.summary;
+    const summary = data?.features?.[0]?.properties?.summary;
+    console.log('DEBUG: getRouteInfo - Route summary:', summary);
 
-  return {
-    time: summary?.duration,
-    distance: summary?.distance,
-    steps: data?.features?.[0]?.properties?.legs?.[0]?.steps || [],
-  };
+    const result = {
+      time: summary?.duration,
+      distance: summary?.distance,
+      steps: data?.features?.[0]?.properties?.legs?.[0]?.steps || [],
+    };
+    
+    console.log('DEBUG: getRouteInfo - Final result:', result);
+    return result;
+  } catch (error) {
+    console.error('DEBUG: getRouteInfo - Error occurred:', error);
+    throw error;
+  }
 }
