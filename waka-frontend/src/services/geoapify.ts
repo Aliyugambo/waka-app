@@ -25,7 +25,9 @@ export async function fetchPlaces(
     params.append('search', search.trim());
   }
 
-  const res = await fetch(`${baseUrl}/place/google?${params.toString()}`);
+  const res = await fetch(`${baseUrl}/place/google?${params.toString()}`, {
+    credentials: 'include',
+  });
   if (!res.ok) {
     throw new Error('Failed to fetch places from backend');
   }

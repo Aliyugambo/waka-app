@@ -10,7 +10,7 @@ async function bootstrap() {
     : [
         'http://localhost:5173',
         'http://localhost:5174',
-        'https://waka-app-23wr.vercel.app/',
+        'https://waka-app-23wr.vercel.app',
       ];
 
   app.enableCors({
