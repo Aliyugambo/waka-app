@@ -14,7 +14,8 @@ export async function fetchPlaces(
   type: string,
   search?: string
 ): Promise<Place[]> {
-  const baseUrl = 'http://localhost:3000'; // Your backend base URL
+  // const baseUrl = 'http://localhost:3001';
+  const baseUrl = 'https://waka-app-nfvt.onrender.com';
   const params = new URLSearchParams({
     lat: lat.toString(),
     lon: lon.toString(),
